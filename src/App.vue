@@ -11,14 +11,13 @@ export default {
 </script>
 
 <style lang="scss">
-a{
-  text-decoration: none;
-  color: inherit;
-  font-size: 12px;
-}
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "~@/assets/style/reset.scss";
+@import "~@/assets/style/helper.scss";
+body{
+  font-family: $font-hei;
+  line-height: 1.5;
+  color: #333;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 </style>
