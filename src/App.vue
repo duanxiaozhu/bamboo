@@ -18,6 +18,9 @@ body{
   line-height: 1.5;
   color: #333;
   -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  -moz-osx-font-smoothing:grayscale;font-size: 16px;
+}
+button,input{
+  font: inherit;
 }
 </style>
