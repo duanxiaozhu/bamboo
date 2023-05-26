@@ -3,13 +3,19 @@ import VueRouter from 'vue-router'
 import Money from '@/views/Money.vue'
 import Labels from '@/views/Labels.vue'
 import Statistics from '@/views/Statistics.vue'
+import Edit from "@/components/Money/Edit.vue"
+import EditLabel from "@/views/EditLabel.vue"
 
 Vue.use(VueRouter)
 
-const routes= [
+const routes = [
   {
-    path:'/',
-    redirect:'/money'
+    path: '/',
+    redirect: '/money'
+  },
+  {
+    path: '/money/edit',
+    component: Edit,
   },
   {
     path: '/money',
@@ -17,11 +23,15 @@ const routes= [
   },
   {
     path: '/labels',
-    component:Labels
+    component: Labels
   },
   {
-    path:'/statistics',
-    component:Statistics
+    path:'/labels/edit/:id',
+    component:EditLabel
+  },
+  {
+    path: '/statistics',
+    component: Statistics
   }
 ]
 

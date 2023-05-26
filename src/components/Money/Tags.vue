@@ -1,43 +1,58 @@
 <template>
   <div class="tags">
     <ul class="current">
-      <li>
-        <Icon name="other" />
-        <span>其他</span>
+      <li
+        v-for="(tag, index) in dataSource"
+        :key="index"
+        :class="{ selected: selectedTags[0].value.indexOf(tag.value) >= 0 }"
+        @click="toggle(tag)"
+      >
+        <Icon :name="tag.name" />
+        <span>{{ tag.value }}</span>
       </li>
-      <li>
-        <Icon name="catering" />
-        <span>餐饮</span>
-      </li>
-      <li>
-        <Icon name="traffic" />
-        <span>交通</span>
-      </li>
-      <li>
-        <Icon name="shopping" />
-        <span>购物</span>
-      </li>
-      <li>
-        <Icon name="reside" />
-        <span>居住</span>
-      </li>
-      <li>
-        <Icon name="amusement" />
-        <span>娱乐</span>
-      </li>
-      <li>
-        <Icon name="medical" />
-        <span>医疗</span>
+      <li @click="edit">
+        <Icon name="edit" />
+        <span>编辑</span>
       </li>
     </ul>
     <div class="new">
-      <button>新增标签</button>
+      <button @click="create">新增标签</button>
     </div>
   </div>
 </template>
 
-<script>
-export default {};
+<script lang='ts'>
+import Vue from "vue";
+import { Component, Prop } from "vue-property-decorator";
+type sourceType = { name: string; value: string };
+interface tagType {
+  name: string;
+  value: string;
+}
+@Component
+export default class Tags extends Vue {
+  @Prop(Array) dataSource: sourceType[] | undefined;
+  selectedTags: sourceType[] = [{ name: "other", value: "其他" }];
+  toggle(tag: tagType) {
+    const length = this.selectedTags.length;
+    if (length >= 1) {
+      this.selectedTags.splice(0);
+      this.selectedTags.push(tag);
+    }
+    this.$emit('update:value',this.selectedTags)
+  }
+  edit() {
+    this.$router.push("/money/edit");
+  }
+  create() {
+    const names = window.prompt("请输入标签名");
+    if (names === "") {
+      return
+    } else if (this.dataSource) {
+      this.$emit("update:dataSource", [...this.dataSource, {name:'other',value:names}]);
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -56,6 +71,9 @@ export default {};
       flex-wrap: wrap;
       justify-content: center;
       align-content: center;
+      &.selected {
+        color: red;
+      }
       .icon {
         width: 28px;
         height: 28px;
