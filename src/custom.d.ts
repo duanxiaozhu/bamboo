@@ -20,4 +20,6 @@ interface Window {
   findTag:(id:string)=>Tag
   removeTag:(id:string)=>boolean
   updateTag:(id: string, value: string) => 'success' | 'not found' | 'duplicated'
+  recordList:RecordItem[]
+  createRecord:(record:RecordItem)=>void
 }

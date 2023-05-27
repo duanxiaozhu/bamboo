@@ -13,11 +13,8 @@ import NumberPad from "@/components/Money/NumberPad.vue";
 import Types from "@/components/Money/Types.vue";
 import FormItem from "@/components/Money/FormItem.vue";
 import Tags from "@/components/Money/Tags.vue";
-import { Component, Watch } from "vue-property-decorator";
-import recordListModel from "@/models/recordListModel";
-import tagListModel from "@/models/tagListModel"
+import { Component} from "vue-property-decorator";
 type sourceType = { name: string; value: string };
-const recordList = recordListModel.fetch();
 
 
 @Component({ components: { NumberPad, Types, FormItem, Tags } })
@@ -33,7 +30,7 @@ export default class Money extends Vue {
   //   { name: "medical", value: "医疗" },
   // ];
 
-  recordList: RecordItem[] = recordList;
+  recordList: RecordItem[] = window.recordList;
 
   record: RecordItem = {
     tags: [{ name: "other", value: "其他" }],
@@ -50,11 +47,7 @@ export default class Money extends Vue {
     this.record.notes = value;
   }
   saveRecord() {
-    recordListModel.create(this.record)
-  }
-  @Watch("recordList")
-  onRecordListChange() {
-    recordListModel.save();
+    window.createRecord(this.record)
   }
 }
 </script>
