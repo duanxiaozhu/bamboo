@@ -25,7 +25,7 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 type sourceType = { name: string; value: string };
-interface tagType {
+type tagType ={
   name: string;
   value: string;
 }
