@@ -2,9 +2,9 @@
   <div class="tags">
     <ul class="current">
       <li
-        v-for="(tag, index) in dataSource"
+        v-for="(tag, index) in tagList"
         :key="index"
-        :class="{ selected: selectedTags[0].id===(tag.id)  }"
+        :class="{ selected: selectedTags[0].value===(tag.value)  }"
         @click="toggle(tag)"
       >
         <Icon :name="tag.name" />
@@ -22,12 +22,13 @@
 </template>
 
 <script lang='ts'>
+import store from "@/store/index2";
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 @Component
 export default class Tags extends Vue {
-  @Prop(Array) dataSource: Tag[] | undefined;
-  selectedTags: Tag[] = [{id:"1",name: "other", value: "其他" }];
+  tagList=store.fetchTags()
+  selectedTags: Tag[] = [{id:"",name: "other", value: "其他" }];
   toggle(tag: Tag) {
     const length = this.selectedTags.length;
     if (length >= 1) {
@@ -41,11 +42,10 @@ export default class Tags extends Vue {
   }
   create() {
     const names = window.prompt("请输入标签名");
-    if (names === "") {
-      return
-    } else if (this.dataSource) {
-      this.$emit("update:dataSource", [...this.dataSource, {name:'other',value:names}]);
+    if (!names) {
+      return window.alert('标签不能为空')
     }
+    store.createTag(names)
   }
 }
 </script>

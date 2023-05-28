@@ -1,5 +1,5 @@
 type RecordItem = {
-  tags: sourceType[];
+  tags: Tag[];
   notes: string;
   type: string;
   amount: number;
@@ -15,11 +15,5 @@ type TagListModel = {
   save: () => void
 }
 interface Window {
-  tagList: Tag[]
-  createTag: (names: string) => void
-  findTag:(id:string)=>Tag
-  removeTag:(id:string)=>boolean
-  updateTag:(id: string, value: string) => 'success' | 'not found' | 'duplicated'
-  recordList:RecordItem[]
-  createRecord:(record:RecordItem)=>void
+
 }
