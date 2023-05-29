@@ -4,7 +4,7 @@
       <li
         v-for="(tag, index) in tagList"
         :key="index"
-        :class="{ selected: selectedTags[0].value===(tag.value)  }"
+        :class="{ selected: selectedTags[0].value === tag.value }"
         @click="toggle(tag)"
       >
         <Icon :name="tag.name" />
@@ -22,20 +22,24 @@
 </template>
 
 <script lang='ts'>
-import store from "@/store/index2";
 import Vue from "vue";
-import { Component, Prop } from "vue-property-decorator";
+import { Component} from "vue-property-decorator";
 @Component
 export default class Tags extends Vue {
-  tagList=store.fetchTags()
-  selectedTags: Tag[] = [{id:"",name: "other", value: "其他" }];
+  get tagList() {
+    return this.$store.state.tagList;
+  }
+  selectedTags: Tag[] = [{ id: "", name: "other", value: "其他" }];
+  created() {
+    this.$store.commit("fetchTags");
+  }
   toggle(tag: Tag) {
     const length = this.selectedTags.length;
     if (length >= 1) {
       this.selectedTags.splice(0);
       this.selectedTags.push(tag);
     }
-    this.$emit('update:value',this.selectedTags)
+    this.$emit("update:value", this.selectedTags);
   }
   edit() {
     this.$router.push("/money/edit");
@@ -43,9 +47,9 @@ export default class Tags extends Vue {
   create() {
     const names = window.prompt("请输入标签名");
     if (!names) {
-      return window.alert('标签不能为空')
+      return window.alert("标签不能为空");
     }
-    store.createTag(names)
+    this.$store.commit("createTag", names);
   }
 }
 </script>
