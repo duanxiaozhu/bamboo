@@ -7,19 +7,20 @@
       placeholder="在这里输入备注"
     />
     <Tags @update:value="onUpdateTags" />
-    <Types :value.sync="record.type" />
+    <Tabs :data-source="recordTypeList" :value.sync="record.type" />
   </Layout>
 </template>
 
 <script lang='ts'>
 import Vue from "vue";
 import NumberPad from "@/components/Money/NumberPad.vue";
-import Types from "@/components/Money/Types.vue";
 import FormItem from "@/components/Money/FormItem.vue";
 import Tags from "@/components/Money/Tags.vue";
+import Tabs from "@/components/Tabs.vue";
+import recordTypeList from '@/constants/recordTypeList'
 import { Component } from "vue-property-decorator";
 
-@Component({ components: { NumberPad, Types, FormItem, Tags } })
+@Component({ components: { NumberPad, FormItem, Tags,Tabs } })
 export default class Money extends Vue {
   // tags = [
   //   { name: "other", value: "其他" },
@@ -30,6 +31,7 @@ export default class Money extends Vue {
   //   { name: "amusement", value: "娱乐" },
   //   { name: "medical", value: "医疗" },
   // ];
+  recordTypeList=recordTypeList;
   get recordList() {
     return this.$store.state.recordList;
   }

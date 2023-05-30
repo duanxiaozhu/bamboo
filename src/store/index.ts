@@ -65,7 +65,7 @@ const store = new Vuex.Store({
       window.localStorage.setItem('recordList', JSON.stringify(state.recordList));
     },
     fetchTags(state) {
-      return state.tagList = JSON.parse(window.localStorage.getItem('tagList') || '[]');
+       state.tagList = JSON.parse(window.localStorage.getItem('tagList') || '[]');
     },
     createTag(state, names) {
       const itemValue = state.tagList.map(item => item.value)

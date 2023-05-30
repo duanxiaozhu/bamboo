@@ -5,6 +5,8 @@ import Labels from '@/views/Labels.vue'
 import Statistics from '@/views/Statistics.vue'
 import Edit from "@/components/Money/Edit.vue"
 import EditLabel from "@/views/EditLabel.vue"
+import Add from "@/components/Money/Add.vue"
+import EditTags from "@/components/Money/EditTags.vue"
 
 Vue.use(VueRouter)
 
@@ -16,6 +18,14 @@ const routes = [
   {
     path: '/money/edit',
     component: Edit,
+  },
+  {
+    path: '/money/editTags/:id',
+    component: EditTags,
+  },
+  {
+    path: '/money/edit/add/:types',
+    component: Add,
   },
   {
     path: '/money',

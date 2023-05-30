@@ -1,33 +1,48 @@
 <template>
   <Layout>
-    <Types />
-
-    <div class="detail">
-      <span class="add">追加新的标签</span>
-      <span>></span>
+    <Tabs :data-source="recordTypeList" :value.sync="type" />
+    <div class="detail" @click="addTag(tags[0].name)">
+      <span class="add">添加新的标签</span>
+      <span><Icon name="add" class="icons" /></span>
     </div>
-    <!-- <ol>
-        <li v-for="tag in filteredList"
-            class="detail">
-          <div class="icon-wrapper">
-            <Icon :name="tag.svg" class="icon"></Icon>
-            <span class="tag">{{ tag.name }}</span>
-          </div>
-          <div @click="deleteTag(tag)">
-            <Icon name="delete"
-            ></Icon>
-          </div>
-        </li>
-      </ol> -->
+    <div
+      class="detail"
+      v-for="(tag, index) in tags"
+      :key="index"
+      @click="EditTags(tag.id)"
+    >
+      <span> <Icon :name="tag.name" class="icons" />{{ tag.value }} </span>
+      <span><Icon name="right" class="icons" /></span>
+    </div>
   </Layout>
 </template>
 
 <script lang='ts'>
-import Types from "@/components/Money/Types.vue";
-export default {
-  name: "Money",
-  components: { Types },
-};
+import Vue from "vue";
+import { Component } from "vue-property-decorator";
+import Tabs from "@/components/Tabs.vue";
+import recordTypeList from "@/constants/recordTypeList";
+
+@Component({
+  components: { Tabs },
+})
+export default class Edit extends Vue {
+  recordTypeList = recordTypeList;
+  type = "-";
+  get tags() {
+    return this.$store.state.tagList;
+  }
+
+  beforeCreate() {
+    this.$store.commit("fetchTags");
+  }
+  addTag(add: string) {
+    this.$router.push(`/money/edit/add/${add}`);
+  }
+  EditTags(id: string) {
+    this.$router.push(`/money/editTags/${id}`);
+  }
+}
 </script>
 
 <style lang="scss">
@@ -38,5 +53,15 @@ export default {
   border-bottom: 1px solid #d3d3d3;
   min-height: 45px;
   align-items: center;
+  span {
+    display: flex;
+    align-items: center;
+    > .icons {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+      color: #666;
+    }
+  }
 }
 </style>
