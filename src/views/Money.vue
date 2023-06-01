@@ -35,12 +35,12 @@ export default class Money extends Vue {
   get recordList() {
     return this.$store.state.recordList;
   }
-  record: RecordItem = {
+  record: RecordList = {
     tags: [{ id: "", name: "other", value: "其他" }],
     notes: "",
     type: "-",
     amount: 0,
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   };
   created() {
     this.$store.commit("fetchRecords");

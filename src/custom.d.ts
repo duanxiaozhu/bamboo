@@ -1,10 +1,15 @@
-type RecordItem = {
+type RecordList = {
   tags: Tag[];
   notes: string;
   type: string;
   amount: number;
-  createdAt?: Date;
+  createdAt?: string;
 };
+type RootState = {
+  recordList: RecordList[],
+  tagList: Tag[],
+  currentTag?: Tag
+}
 type Tag = { id: string, name: string, value: string };
 type TagListModel = {
   data: Tag[]

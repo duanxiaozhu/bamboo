@@ -9,10 +9,9 @@
       class="detail"
       v-for="(tag, index) in tags"
       :key="index"
-      @click="EditTags(tag.id)"
     >
       <span> <Icon :name="tag.name" class="icons" />{{ tag.value }} </span>
-      <span><Icon name="right" class="icons" /></span>
+      <span @click="deleteTag(tag)"><Icon name="remove" class="icons" /></span>
     </div>
   </Layout>
 </template>
@@ -36,11 +35,11 @@ export default class Edit extends Vue {
   beforeCreate() {
     this.$store.commit("fetchTags");
   }
+  deleteTag(tag:Tag){
+    this.$store.commit('deleteTag',tag)
+  }
   addTag(add: string) {
     this.$router.push(`/money/edit/add/${add}`);
-  }
-  EditTags(id: string) {
-    this.$router.push(`/money/editTags/${id}`);
   }
 }
 </script>

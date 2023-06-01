@@ -29,7 +29,7 @@ export default class Tags extends Vue {
   get tagList() {
     return this.$store.state.tagList;
   }
-  selectedTags: Tag[] = [{ id: "", name: "other", value: "其他" }];
+  selectedTags: Tag[] = [{ id: "1", name: "other", value: "其他" }];
   created() {
     this.$store.commit("fetchTags");
   }
