@@ -78,18 +78,13 @@ const store = new Vuex.Store({
     },
     setDefault() {
       for (let i = 0; i < defaultTagList.length; i++) {
-        store.commit('createTag', defaultTagList[i].value)
+        store.commit('createTag', defaultTagList[i])
       }
     },
-    createTag(state, names) {
-      const itemValue = state.tagList.map(item => item.value)
-      if (itemValue.indexOf(names) >= 0) {
-        window.alert("重复了")
-      }
+    createTag(state, newTag: Tag) {
       const id = createId().toString()
-      state.tagList.push({ id, name: "other", value: names })
+      state.tagList.push({ id, name: newTag.name, value: newTag.value, type: newTag.type })
       store.commit('saveTags')
-      // window.alert("成功了")
     },
     saveTags(state) {
       window.localStorage.setItem('tagList', JSON.stringify(state.tagList));

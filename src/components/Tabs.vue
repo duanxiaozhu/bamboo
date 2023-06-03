@@ -42,6 +42,7 @@ export default class Tabs extends Vue {
   font-size: 20px;
   display: flex;
   justify-content: center;
+  margin: 0;
   > li {
     margin: 0 16px;
     height: 44px;

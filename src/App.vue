@@ -13,7 +13,7 @@ export default {
 <style lang="scss">
 @import "~@/assets/style/reset.scss";
 @import "~@/assets/style/helper.scss";
-body{
+#app{
   font-family: $font-hei;
   line-height: 1.5;
   color: #333;

@@ -48,6 +48,7 @@ export default class Labels extends mixins(TagHelper) {
     justify-content: space-between;
     border-bottom: 1px solid #e6e6e6;
     padding-right: 8px;
+    color: #333;
     span {
       display: flex;
       align-items: center;

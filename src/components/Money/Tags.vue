@@ -15,21 +15,32 @@
         <span>编辑</span>
       </li>
     </ul>
-    <div class="new">
+    <!-- <div class="new">
       <button @click="create">新增标签</button>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script lang='ts'>
 import Vue from "vue";
-import { Component} from "vue-property-decorator";
+import { Component, Prop } from "vue-property-decorator";
 @Component
 export default class Tags extends Vue {
+  @Prop() type!: string;
   get tagList() {
-    return this.$store.state.tagList;
+    if (this.type === "-") {
+      return this.$store.state.tagList.filter(
+        (tag: Tag) => tag.type === "expenditures"
+      );
+    } else {
+      return this.$store.state.tagList.filter(
+        (tag: Tag) => tag.type === "revenue"
+      );
+    }
   }
-  selectedTags: Tag[] = [{ id: "1", name: "other", value: "其他" }];
+  selectedTags: Tag[] = [
+    { id: "1", name: "other", value: "其他", type: "expenditures" },
+  ];
   created() {
     this.$store.commit("fetchTags");
   }
@@ -66,12 +77,15 @@ export default class Tags extends Vue {
       display: flex;
       flex-direction: column;
       width: 20%;
-      padding: 16px;
+      padding: 8px 16px 8px 16px;
       flex-wrap: wrap;
       justify-content: center;
       align-content: center;
       &.selected {
         color: red;
+        svg {
+          animation: shake 0.3s linear;
+        }
       }
       .icon {
         width: 28px;
@@ -79,6 +93,23 @@ export default class Tags extends Vue {
       }
       > span {
         text-align: center;
+      }
+      @keyframes shake {
+        0% {
+          transform: rotate(0deg);
+        }
+        20% {
+          transform: rotate(20deg);
+        }
+        40% {
+          transform: rotate(0deg);
+        }
+        80% {
+          transform: rotate(-20deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
       }
     }
   }

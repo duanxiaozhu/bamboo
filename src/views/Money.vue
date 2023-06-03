@@ -6,7 +6,7 @@
       fieldName="备注"
       placeholder="在这里输入备注"
     />
-    <Tags @update:value="onUpdateTags" />
+    <Tags :type="record.type" @update:value="onUpdateTags" />
     <Tabs :data-source="recordTypeList" :value.sync="record.type" />
   </Layout>
 </template>
@@ -36,7 +36,7 @@ export default class Money extends Vue {
     return this.$store.state.recordList;
   }
   record: RecordList = {
-    tags: [{ id: "", name: "other", value: "其他" }],
+    tags: [{ id: "", name: "other", value: "其他",type:"expenditures" }],
     notes: "",
     type: "-",
     amount: 0,

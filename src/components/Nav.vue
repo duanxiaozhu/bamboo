@@ -44,6 +44,7 @@ nav {
   }
   >a{
     font-size: 12px;
+    color: #333;
   }
 }
 </style>

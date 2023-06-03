@@ -10,7 +10,7 @@ type RootState = {
   tagList: Tag[],
   currentTag?: Tag
 }
-type Tag = { id: string, name: string, value: string };
+type Tag = { id: string, name: string, value: string ,type:string};
 type TagListModel = {
   data: Tag[]
   fetch: () => Tag[]
