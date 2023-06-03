@@ -17,10 +17,10 @@ import NumberPad from "@/components/Money/NumberPad.vue";
 import FormItem from "@/components/Money/FormItem.vue";
 import Tags from "@/components/Money/Tags.vue";
 import Tabs from "@/components/Tabs.vue";
-import recordTypeList from '@/constants/recordTypeList'
-import { Component } from "vue-property-decorator";
+import recordTypeList from "@/constants/recordTypeList";
+import { Component, Watch } from "vue-property-decorator";
 
-@Component({ components: { NumberPad, FormItem, Tags,Tabs } })
+@Component({ components: { NumberPad, FormItem, Tags, Tabs } })
 export default class Money extends Vue {
   // tags = [
   //   { name: "other", value: "其他" },
@@ -31,12 +31,12 @@ export default class Money extends Vue {
   //   { name: "amusement", value: "娱乐" },
   //   { name: "medical", value: "医疗" },
   // ];
-  recordTypeList=recordTypeList;
+  recordTypeList = recordTypeList;
   get recordList() {
     return this.$store.state.recordList;
   }
   record: RecordList = {
-    tags: [{ id: "", name: "other", value: "其他",type:"expenditures" }],
+    tags: [{ id: "1", name: "other", value: "其他", type: "expenditures" }],
     notes: "",
     type: "-",
     amount: 0,
@@ -53,6 +53,18 @@ export default class Money extends Vue {
   }
   saveRecord() {
     this.$store.commit("createRecords", this.record);
+  }
+  @Watch("record.type")
+  onTypeChange(type: string) {
+    if (type === "-") {
+      this.record.tags = [
+        { id: "1", name: "other", value: "其他", type: "expenditures" },
+      ];
+    } else {
+      this.record.tags = [
+        { id: "12", name: "other", value: "其他", type: "revenue" },
+      ];
+    }
   }
 }
 </script>

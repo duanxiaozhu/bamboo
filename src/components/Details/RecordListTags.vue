@@ -1,60 +1,47 @@
 <template>
-  <Layout>
-    <Tabs
-      class-prefix="type"
-      :data-source="recordTypeList"
-      :value.sync="type"
-    />
-    <Tabs
-      class="interval-tabs"
-      class-prefix="interval"
-      :data-source="intervalList"
-      :value.sync="interval"
-    />
-    <ol>
-      <li v-for="(group, index) in result" :key="index">
-        <h3 class="title">
-          {{ beautify(group.title)
-          }}<span
-            >支出:￥{{ group.dayExpenditure }}
-            <span class="dayRevenue">收入￥:{{ group.dayRevenue }}</span></span
+  <ol>
+    <li v-for="(group, index) in result" :key="index">
+      <h3 class="title">
+        {{ beautify(group.title)
+        }}<span
+          >支出:￥{{ group.dayExpenditure }}
+          <span class="dayRevenue">收入￥:{{ group.dayRevenue }}</span></span
+        >
+      </h3>
+      <ol>
+        <li
+          v-for="item in group.items"
+          :key="item.id"
+          class="record"
+          @click="edit(item.tags[0].id)"
+        >
+          <span><Icon :name="item.tags[0].name" /></span>
+          <span class="notes"
+            >{{ item.tags[0].value }}
+            <span>{{ item.notes }} </span>
+          </span>
+          <span class="amount"
+            ><strong>￥{{ item.type }}{{ item.amount }} </strong></span
           >
-        </h3>
-        <ol>
-          <li v-for="item in group.items" :key="item.id" class="record">
-            <span><Icon :name="item.tags[0].name" /></span>
-            <span class="notes"
-              >{{ item.tags[0].value }}
-              <span>{{ item.notes }} </span>
-            </span>
-            <span class="amount"
-              ><strong>￥{{ item.type }}{{ item.amount }} </strong></span
-            >
-          </li>
-        </ol>
-      </li>
-    </ol>
-  </Layout>
+        </li>
+      </ol>
+    </li>
+  </ol>
 </template>
 
 <script lang='ts'>
 import Tabs from "@/components/Tabs.vue";
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import intervalList from "@/constants/intervalList";
-import recordTypeList from "@/constants/recordTypeList";
 import dayjs from "dayjs";
-import clone from "@/lib/clone"; 
-const oneDay = 86400 * 1000;
-console.log(dayjs());
+import clone from "@/lib/clone";
+
 @Component({
   components: { Tabs },
 })
-export default class Statistics extends Vue {
+export default class recordList extends Vue {
   type = "-";
   interval = "day";
-  intervalList = intervalList;
-  recordTypeList = recordTypeList;
 
   beautify(string: string) {
     const day = dayjs(string);
@@ -119,22 +106,12 @@ export default class Statistics extends Vue {
     });
     return result;
   }
-  
-  months(type: string) {
-    let monthly = 0;
-    const now = dayjs();
-    const { recordList } = this;
-    const newList = clone(recordList).filter((r) => r.type === type);
-    for (let i = 0; i < newList.length; i++) {
-      if (now.isSame(dayjs(newList[i].createdAt), "month")) {
-        monthly += newList[i].amount;
-      }
-    }
-    return monthly
-  }
-
   beforeCreate() {
     this.$store.commit("fetchRecords");
+  }
+
+  edit(id:string) {
+    this.$emit('update:value',id)
   }
 }
 </script>
@@ -193,31 +170,5 @@ export default class Statistics extends Vue {
     width: 20%;
     justify-content: flex-end;
   }
-}
-.interval-tabs {
-  background: #e8e8e8;
-  padding: 4px 16px 8px 16px;
-}
-::v-deep .tabs > .interval-tabs-item {
-  width: 33%;
-  height: 30px;
-  border: 1px solid black;
-  margin: 0;
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  &.selected {
-    background: #333;
-    color: #e8e8e8;
-    &::after {
-      display: none;
-    }
-  }
-}
-::v-deep .tabs > .interval-tabs-item:first-child {
-  border-radius: 4px 0 0 4px;
-}
-::v-deep .tabs > .interval-tabs-item:last-child {
-  border-radius: 0 4px 4px 0;
 }
 </style>

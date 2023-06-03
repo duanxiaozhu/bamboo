@@ -9,6 +9,7 @@ type RootState = {
   recordList: RecordList[],
   tagList: Tag[],
   currentTag?: Tag
+  budget:number|null
 }
 type Tag = { id: string, name: string, value: string ,type:string};
 type TagListModel = {

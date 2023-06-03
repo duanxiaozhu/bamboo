@@ -12,9 +12,26 @@ const store = new Vuex.Store({
   state: {
     recordList: [],
     tagList: [],
-    currentTag: undefined
+    currentTag: undefined,
+    budget: null
   } as RootState,
   mutations: {
+    //budget
+    removeBudget(state) {
+      state.budget = null;
+      store.commit('saveBudget');
+    },
+    fetchBudget(state) {
+      state.budget = JSON.parse(window.localStorage.getItem('budget') || '0');
+    },
+    createBudget(state, money: number) {
+      state.budget = money;
+      store.commit('saveBudget');
+    },
+    saveBudget(state) {
+      window.localStorage.setItem('budget', JSON.stringify(state.budget));
+    },
+
     setCurrentTag(state, id: string) {
       state.currentTag = state.tagList.filter(t => t.id === id)[0]
     },
