@@ -13,7 +13,7 @@
           v-for="item in group.items"
           :key="item.id"
           class="record"
-          @click="edit(item.tags[0].id)"
+          @click="edit(item.id)"
         >
           <span><Icon :name="item.tags[0].name" /></span>
           <span class="notes"
@@ -39,7 +39,7 @@ import clone from "@/lib/clone";
 @Component({
   components: { Tabs },
 })
-export default class recordList extends Vue {
+export default class RecordListTags extends Vue {
   type = "-";
   interval = "day";
 

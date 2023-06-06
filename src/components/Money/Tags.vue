@@ -7,17 +7,14 @@
         :class="{ selected: selectedTags[0].value === tag.value }"
         @click="toggle(tag)"
       >
-        <Icon :name="tag.name" />
+        <span class="icons"><Icon :name="tag.name" /></span>
         <span>{{ tag.value }}</span>
       </li>
       <li @click="edit">
-        <Icon name="edit" />
+        <span class="icons"><Icon name="edit" /></span>
         <span>编辑</span>
       </li>
     </ul>
-    <!-- <div class="new">
-      <button @click="create">新增标签</button>
-    </div> -->
   </div>
 </template>
 
@@ -67,7 +64,7 @@ export default class Tags extends Vue {
 
 <style lang="scss" scoped>
 .tags {
-  font-size: 14px;
+  font-size: 12px;
   padding: 16px;
   flex-grow: 1;
   > .current {
@@ -87,40 +84,40 @@ export default class Tags extends Vue {
           animation: shake 0.3s linear;
         }
       }
-      .icon {
-        width: 28px;
-        height: 28px;
-      }
+
       > span {
         text-align: center;
       }
-      @keyframes shake {
-        0% {
-          transform: rotate(0deg);
-        }
-        20% {
-          transform: rotate(20deg);
-        }
-        40% {
-          transform: rotate(0deg);
-        }
-        80% {
-          transform: rotate(-20deg);
-        }
-        100% {
-          transform: rotate(0deg);
-        }
-      }
     }
   }
-  > .new {
-    padding-left: 16px;
-    button {
-      background: transparent;
-      border: none;
-      color: #999;
-      border-bottom: 1px solid;
-      padding: 0 4px;
+  .icons {
+    background: #f5f5f5;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  @keyframes shake {
+    0% {
+      transform: rotate(0deg);
+    }
+    20% {
+      transform: rotate(20deg);
+    }
+    40% {
+      transform: rotate(0deg);
+    }
+    80% {
+      transform: rotate(-20deg);
+    }
+    100% {
+      transform: rotate(0deg);
     }
   }
 }

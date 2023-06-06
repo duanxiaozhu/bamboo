@@ -2,12 +2,12 @@
   <Layout>
     <div class="navBar">
       <Icon name="left" class="leftIcon" @click.native="goBack" />
-      <span class="title">{{ moneyType }}新标签</span>
+      <span>{{ moneyType }}新标签</span>
       <span class="rightIcon"></span>
     </div>
     <div class="form-wrapper">
       <FormItem
-        @update:value="onUpdateNotes"
+        :value.sync="value"
         fieldName="标签名"
         placeholder="请输入标签名 "
       />
@@ -32,7 +32,7 @@ import IconsList from "@/components/Money/IconsList.vue";
 })
 export default class Add extends Vue {
   icons = "dog";
-  notes = "";
+  value = "";
   get moneyType() {
     return this.$route.params.types === "expenditures" ? "支出" : "收入";
   }
@@ -42,34 +42,31 @@ export default class Add extends Vue {
     const names = this.$store.state.tagList.map(
       (tag: { value: string }) => tag.value
     );
-    if (this.notes.length === 0) {
-      this.$warning({
+    if (this.value.length === 0) {
+      this.$error({
         centered: true,
         title: "标签名不能为空",
         content: "请输入标签名",
       });
-    } else if (names.indexOf(this.notes) >= 0) {
-      this.$warning({
+    } else if (names.indexOf(this.value) >= 0) {
+      this.$error({
         centered: true,
         title: "标签名重复了",
         content: "请重新输入",
       });
-      this.notes = "";
+      this.value = "";
     } else {
       this.$store.commit("createTag", {
         name: this.icons,
-        value: this.notes,
+        value: this.value,
         type: this.$route.params.types,
       });
       this.$message.success({ content: "已保存", duration: 1 });
-      this.notes = "";
+      this.value = "";
     }
   }
   onUpdateIcons(value: string) {
     this.icons = value;
-  }
-  onUpdateNotes(value: string) {
-    this.notes = value;
   }
   goBack() {
     this.$router.back();
@@ -86,8 +83,6 @@ export default class Add extends Vue {
   align-items: center;
   justify-content: space-between;
   background: #e8e8e8;
-  > .title {
-  }
   > .leftIcon {
     width: 28px;
     height: 28px;

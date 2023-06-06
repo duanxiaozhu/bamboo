@@ -1,17 +1,16 @@
 <template>
   <Layout>
     <Tabs :data-source="recordTypeList" :value.sync="type" />
-    <div class="detail" >
+    <div class="detail">
       <span class="add">添加新的标签</span>
-      <span><Icon name="add" @click="addTag(tags[0].type)"/></span>
+      <span><Icon name="add" @click="addTag(tags[0].type)" class="svg"/></span>
     </div>
-    <div
-      class="detail"
-      v-for="(tag, index) in tags"
-      :key="index"
-    >
-      <span> <Icon :name="tag.name" class="icons" />{{ tag.value }} </span>
-      <span @click="deleteTag(tag)"><Icon name="remove" /></span>
+    <div class="detail" v-for="(tag, index) in tags" :key="index">
+      <div class="tagList">
+        <span class="icons"> <Icon :name="tag.name" /></span
+        ><span>{{ tag.value }} </span>
+      </div>
+      <span @click="deleteTag(tag)"><Icon name="remove" class="svg"/></span>
     </div>
   </Layout>
 </template>
@@ -44,19 +43,17 @@ export default class Edit extends Vue {
     this.$store.commit("fetchTags");
   }
   deleteTag(tag: Tag) {
-    const _this= this;
+    const _this = this;
     this.$confirm({
-      content: '确定要删除该标签吗?',
-      okText: '确定',
+      content: "确定要删除该标签吗?",
+      okText: "确定",
       cancelText: "取消",
-      centered:true,
-      onOk(){
-        _this.$store.commit('deleteTag', tag)
-        _this.$message.success({content: '已删除',duration:1});
-      }
-    })
-
-
+      centered: true,
+      onOk() {
+        _this.$store.commit("deleteTag", tag);
+        _this.$message.success({ content: "已删除", duration: 1 });
+      },
+    });
   }
   addTag(add: string) {
     this.$router.push(`/money/edit/add/${add}`);
@@ -72,15 +69,32 @@ export default class Edit extends Vue {
   border-bottom: 1px solid #d3d3d3;
   min-height: 45px;
   align-items: center;
-  span {
+  > .tagList {
     display: flex;
     align-items: center;
     > .icons {
-      width: 28px;
-      height: 28px;
+      background: #f5f5f5;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       margin-right: 8px;
-      color: #666;
+
+      > svg {
+        width: 24px;
+        height: 24px;
+      }
     }
+  }
+  span {
+    display: flex;
+    align-items: center;
+      >.svg {
+    width: 18px;
+    height: 18px;
+  }
   }
 }
 </style>

@@ -11,197 +11,420 @@
       :data-source="intervalList"
       :value.sync="interval"
     />
-    <ol>
-      <li v-for="(group, index) in result" :key="index">
-        <h3 class="title">
-          {{ beautify(group.title)
-          }}<span
-            >支出:￥{{ group.dayExpenditure }}
-            <span class="dayRevenue">收入￥:{{ group.dayRevenue }}</span></span
-          >
-        </h3>
-        <ol>
-          <li v-for="item in group.items" :key="item.id" class="record">
-            <span><Icon :name="item.tags[0].name" /></span>
-            <span class="notes"
-              >{{ item.tags[0].value }}
-              <span>{{ item.notes }} </span>
-            </span>
-            <span class="amount"
-              ><strong>￥{{ item.type }}{{ item.amount }} </strong></span
-            >
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div class="chart">
+      <div class="caption">
+        <span v-if="interval === 'week'">本周</span>
+        <span v-else-if="interval === 'month'">本月</span>
+        <span v-else>今年</span>
+      </div>
+      <div class="total">总支出: ¥{{ total }}</div>
+      <div class="average">平均值: ¥{{ average }}</div>
+      <div id="figure"></div>
+    </div>
+    <div class="ranking">
+      <div class="caption">
+        <span>支出排行榜</span>
+      </div>
+      <ul class="tag-list" v-if="targetRecords.length > 0">
+        <li
+          class="tag-item"
+          v-for="(item, index) in this.groupByTag()"
+          :key="index"
+        >
+          <div class="tag-info">
+            <div class="icons">
+              <Icon :name="item.tag.name" />
+            </div>
+            <span>{{ item.tag.value }}</span>
+            <span>{{ item.percentage }}%</span>
+          </div>
+          <div>￥{{ item.amount }}</div>
+        </li>
+      </ul>
+      <div v-else>
+        <NoResult />
+      </div>
+    </div>
   </Layout>
 </template>
 
 <script lang='ts'>
 import Tabs from "@/components/Tabs.vue";
 import Vue from "vue";
-import { Component } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
 import intervalList from "@/constants/intervalList";
 import recordTypeList from "@/constants/recordTypeList";
 import dayjs from "dayjs";
-import clone from "@/lib/clone"; 
-const oneDay = 86400 * 1000;
-console.log(dayjs());
+import clone from "@/lib/clone";
+import echarts from "echarts";
+import { twoDecimalPlaces } from "@/lib/decimal";
+import NoResult from "@/components/NoResult.vue";
+
+type Group = {
+  tag: Tag;
+  amount: number;
+  percentage: number;
+};
+
 @Component({
-  components: { Tabs },
+  components: { Tabs, NoResult },
 })
 export default class Statistics extends Vue {
-  type = "-";
-  interval = "day";
+  type: "+" | "-" = "-";
+  interval: "week" | "month" | "year" = "week";
   intervalList = intervalList;
   recordTypeList = recordTypeList;
 
-  beautify(string: string) {
-    const day = dayjs(string);
+  get targetRecords(): RecordList[] {
     const now = dayjs();
-    if (day.isSame(now, "day")) {
-      return "今天";
-    } else if (day.isSame(now.subtract(1, "day"), "day")) {
-      return "昨天";
-    } else if (day.isSame(now.subtract(2, "day"), "day")) {
-      return "前天";
-    } else if (day.isSame(now, "year")) {
-      return day.format("M月D日");
-    } else {
-      return day.format("YYYY年M月D日");
-    }
-  }
-  get recordList() {
-    return (this.$store.state as RootState).recordList;
-  }
-  get result() {
-    const { recordList } = this;
-    const newList = clone(recordList).sort(
-      (a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
-    );
-    if (newList.length === 0) {
-      return [] as Result;
-    }
-    type Result = {
-      title: string;
-      dayExpenditure?: number;
-      dayRevenue?: number;
-      items: RecordList[];
-    }[];
-    const result: Result = [
-      {
-        title: dayjs(newList[0].createdAt).format("YYYY-MM-DD"),
-        items: [newList[0]],
-      },
-    ];
-    for (let i = 1; i < newList.length; i++) {
-      const current = newList[i];
-      const last = result[result.length - 1];
-      if (dayjs(last.title).isSame(dayjs(current.createdAt), "day")) {
-        last.items.push(current);
-      } else {
-        result.push({
-          title: dayjs(current.createdAt).format("YYYY-MM-DD"),
-          items: [current],
-        });
-      }
-    }
-    result.map((group) => {
-      const typeGroup = group.items.filter((tags) => tags.type === "-");
-      group.dayExpenditure = typeGroup.reduce(
-        (sum, item) => sum + item.amount,
-        0
-      );
-    });
-    result.map((group) => {
-      const typeGroup = group.items.filter((tags) => tags.type === "+");
-      group.dayRevenue = typeGroup.reduce((sum, item) => sum + item.amount, 0);
-    });
-    return result;
-  }
-  
-  months(type: string) {
-    let monthly = 0;
-    const now = dayjs();
-    const { recordList } = this;
-    const newList = clone(recordList).filter((r) => r.type === type);
-    for (let i = 0; i < newList.length; i++) {
-      if (now.isSame(dayjs(newList[i].createdAt), "month")) {
-        monthly += newList[i].amount;
-      }
-    }
-    return monthly
+    return clone<RecordList[]>(this.$store.state.recordList)
+      .filter((item) => item.type === this.type)
+      .filter((item) => dayjs(item.createdAt).isSame(now, this.interval));
   }
 
-  beforeCreate() {
+  get total() {
+    const amounts = [...this.groupByInterval().values()];
+    let sum = 0;
+    for (let i = 0; i < amounts.length; i++) {
+      sum += amounts[i];
+    }
+    return sum;
+  }
+
+  get average() {
+    switch (this.interval) {
+      case "week":
+        return twoDecimalPlaces(this.total / 7);
+      case "month":
+        return twoDecimalPlaces(this.total / this.days);
+      case "year":
+        return twoDecimalPlaces(this.total / 12);
+      default:
+        return 0;
+    }
+  }
+
+  groupByInterval(): Map<string, number> {
+    let result = new Map<string, number>();
+    switch (this.interval) {
+      case "week":
+        result = this.groupByWeek(this.targetRecords);
+        break;
+      case "month":
+        result = this.groupByMonth(this.targetRecords);
+        break;
+      case "year":
+        result = this.groupByYear(this.targetRecords);
+        break;
+    }
+    return result;
+  }
+
+  groupByTag(): Group[] {
+    const tags: string[] = [];
+    let result: Group[] = [];
+    let r: RecordList;
+    for (r of this.targetRecords) {
+      const index = tags.indexOf(r.tags[0].name);
+      if (index < 0) {
+        tags.push(r.tags[0].name);
+        result.push({ tag: r.tags[0], amount: r.amount, percentage: 0 });
+      } else {
+        result[index].amount += r.amount;
+      }
+    }
+    for (let i = 0; i < result.length; i++) {
+      result[i].percentage = twoDecimalPlaces(
+        (result[i].amount * 100) / this.total
+      );
+    }
+    result = result.sort((b, a) => a.percentage - b.percentage);
+    return result;
+  }
+
+  get days() {
+    const [year, month] = [dayjs().year(), dayjs().month()];
+    const d = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    if (
+      (year % 4 === 0 && year % 100 !== 0) ||
+      (year % 100 === 0 && year % 400 === 0)
+    ) {
+      if (month === 1) {
+        return 29;
+      } else {
+        return d[month];
+      }
+    } else {
+      return d[month];
+    }
+  }
+
+  groupByWeek(records: RecordList[]): Map<string, number> {
+    const keys = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const result = new Map<string, number>();
+    let i: number;
+    // 初始化
+    for (i = 0; i < keys.length; i++) {
+      result.set(keys[i], 0);
+    }
+    let r: RecordList;
+    for (r of records) {
+      const key = keys[dayjs(r.createdAt).day()];
+      const amount = result.get(key) as number;
+      result.set(key, amount + r.amount);
+    }
+    return result;
+  }
+
+  groupByMonth(records: RecordList[]): Map<string, number> {
+    const keys: string[] = [];
+    const result = new Map<string, number>();
+    let i: number;
+    // 初始化
+    for (i = 1; i < this.days; i++) {
+      keys.push(i.toString());
+    }
+    for (i = 0; i < keys.length; i++) {
+      result.set(keys[i], 0);
+    }
+    let r: RecordList;
+    for (r of records) {
+      const key = dayjs(r.createdAt).date().toString();
+      const amount = result.get(key) as number;
+      result.set(key, amount + r.amount);
+    }
+    return result;
+  }
+
+  groupByYear(records: RecordList[]): Map<string, number> {
+    const keys = [
+      "一月",
+      "二月",
+      "三月",
+      "四月",
+      "五月",
+      "六月",
+      "七月",
+      "八月",
+      "九月",
+      "十月",
+      "十一月",
+      "十二月",
+    ];
+    const result = new Map<string, number>();
+    let i: number;
+    // 初始化
+    for (i = 0; i < keys.length; i++) {
+      result.set(keys[i], 0);
+    }
+    let r: RecordList;
+    for (r of records) {
+      const key = keys[dayjs(r.createdAt).month()];
+      const amount = result.get(key) as number;
+      result.set(key, amount + r.amount);
+    }
+    return result;
+  }
+
+  toArray(value: number, length: number): number[] {
+    const result: number[] = [];
+    for (let i = 0; i < length; i++) {
+      result.push(value);
+    }
+    return result;
+  }
+
+  draw(data: Map<string, number>) {
+    // 提取变量
+    const x = [...data.keys()];
+    const y = [...data.values()];
+
+    const figure = echarts.init(
+      document.getElementById("figure") as HTMLDivElement
+    );
+    figure.setOption({
+      grid: {
+        top: "5%",
+        bottom: "12%",
+        left:"2%",
+        right:"2%"
+      },
+      xAxis: {
+        data: x,
+        axisTick: {
+          interval: 0,
+          lineStyle: {
+            opacity: 0,
+          },
+        },
+        axisLabel: {
+          interval: 0,
+          fontSize: 8,
+          color: "#999999",
+        },
+      },
+      yAxis: {
+        axisLine: {
+          lineStyle: {
+            opacity: 0,
+          },
+        },
+        splitLine: {
+          lineStyle: {
+            opacity: 0,
+          },
+        },
+        axisLabel: undefined,
+        axisTick: undefined,
+      },
+      series: [
+        {
+          type: "line",
+          data: y,
+          symbolSize:10
+        },
+        {
+          name: "平均线",
+          type: "line",
+          data: this.toArray(this.average, x.length),
+          symbol: "none",
+          lineStyle: {
+            type: "dashed",
+            color: "#999999",
+            width: 1,
+            opacity: 0.5,
+          },
+        },
+        {
+          name: "最大值",
+          type: "line",
+          data: this.toArray(Math.max(...y), x.length),
+          symbol: "none",
+          lineStyle: {
+            color: "#999999",
+            width: 1,
+            opacity: 0.5,
+          },
+        },
+      ],
+      tooltip:{
+        show:true,triggerOn:'click',
+        formatter:'{c}',
+        position:'top'
+      }
+    });
+  }
+  created() {
     this.$store.commit("fetchRecords");
+  }
+  mounted() {
+    this.draw(this.groupByInterval());
+  }
+
+  @Watch("type")
+  onTypeChang() {
+    this.draw(this.groupByInterval());
+  }
+
+  @Watch("interval")
+  onIntervalChange() {
+    this.draw(this.groupByInterval());
   }
 }
 </script>
 
 <style scoped lang="scss">
-%item {
-  margin: 8px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-content: center;
-}
-.title {
-  @extend %item;
-  margin: 0;
-  padding: 0 16px;
-  background: #f5f5f5;
-  font-size: 14px;
-  > span {
-    width: 48%;
+.chart {
+  padding: 6px 0;
+  border-bottom: 1px solid #dddddd;
+
+  > .caption {
+    border-bottom: 1px solid #dddddd;
     display: flex;
-    justify-content: space-between;
-    align-content: center;
-    > .dayRevenue {
-      width: 50%;
-      text-align: right;
-    }
-  }
-}
-.record {
-  background: white;
-  margin: 0 16px;
-  @extend %item;
-  min-height: 48px;
-  border-bottom: 1px solid #e6e6e6;
-  > span {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: center;
-    > .icon {
-      width: 28px;
-      height: 28px;
-    }
-  }
-  > .notes {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
+
     > span {
-      font-size: 12px;
+      padding: 8px 16px;
+      font-size: 14px;
     }
   }
-  > .amount {
-    width: 20%;
-    justify-content: flex-end;
+
+  > .total {
+    font-size: 14px;
+    color: #999999;
+    text-align: left;
+    padding: 6px 6px;
+  }
+
+  > .average {
+    font-size: 12px;
+    color: #999999;
+    text-align: left;
+    padding: 0 6px;
+    margin-bottom: 16px;
+  }
+
+  #figure {
+    width: 100%;
+    height: 180px;
+  }
+}
+
+.ranking {
+  >.caption {
+    text-align: left;
+    font-size: 14px;
+    padding: 6px 16px;
+  }
+
+  >.tag-list {
+    padding: 6px 16px;
+
+    >.tag-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      box-shadow: inset 0 -1px 1px -1px rgba(0, 0, 0, 0.1);
+      font-size: 14px;
+
+      >.tag-info {
+        display: flex;
+        align-items: center;
+
+        >.icons {
+          background: #f5f5f5;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 8px;
+
+          >svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        >span {
+          margin-right: 8px;
+          line-height: 32px;
+        }
+      }
+    }
   }
 }
 .interval-tabs {
   background: #e8e8e8;
   padding: 4px 16px 8px 16px;
 }
-::v-deep .tabs > .interval-tabs-item {
+::v-deep{ .tabs > .interval-tabs-item {
   width: 33%;
   height: 30px;
-  border: 1px solid black;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
   margin: 0;
   font-size: 14px;
   display: flex;
@@ -214,10 +437,13 @@ export default class Statistics extends Vue {
     }
   }
 }
-::v-deep .tabs > .interval-tabs-item:first-child {
+.tabs > .interval-tabs-item:first-child {
   border-radius: 4px 0 0 4px;
+  border: 1px solid black;
 }
-::v-deep .tabs > .interval-tabs-item:last-child {
+.tabs > .interval-tabs-item:last-child {
   border-radius: 0 4px 4px 0;
+  border: 1px solid black;}
+
 }
 </style>

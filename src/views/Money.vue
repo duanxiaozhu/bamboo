@@ -2,7 +2,7 @@
   <Layout class-prefix="layout">
     <NumberPad :value.sync="record.amount" @submit="saveRecord" />
     <FormItem
-      @update:value="onUpdateNotes"
+      :value.sync="record.notes"
       fieldName="备注"
       placeholder="在这里输入备注"
     />
@@ -22,20 +22,12 @@ import { Component, Watch } from "vue-property-decorator";
 
 @Component({ components: { NumberPad, FormItem, Tags, Tabs } })
 export default class Money extends Vue {
-  // tags = [
-  //   { name: "other", value: "其他" },
-  //   { name: "catering", value: "餐饮" },
-  //   { name: "traffic", value: "交通" },
-  //   { name: "shopping", value: "购物" },
-  //   { name: "reside", value: "居住" },
-  //   { name: "amusement", value: "娱乐" },
-  //   { name: "medical", value: "医疗" },
-  // ];
   recordTypeList = recordTypeList;
   get recordList() {
     return this.$store.state.recordList;
   }
   record: RecordList = {
+    id: "",
     tags: [{ id: "1", name: "other", value: "其他", type: "expenditures" }],
     notes: "",
     type: "-",
@@ -48,11 +40,11 @@ export default class Money extends Vue {
   onUpdateTags(value: Tag[]) {
     this.record.tags = value;
   }
-  onUpdateNotes(value: string) {
-    this.record.notes = value;
-  }
+
   saveRecord() {
     this.$store.commit("createRecords", this.record);
+    this.record.notes = "";
+    this.$message.success({ content: "已保存", duration: 1 });
   }
   @Watch("record.type")
   onTypeChange(type: string) {

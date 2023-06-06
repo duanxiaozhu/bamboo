@@ -1,6 +1,6 @@
 <template>
-  <Layout class="zz">
-    <div class="title">账本明细</div>
+  <Layout >
+    <div class="title"><strong>账本明细</strong></div>
     <div class="parcel">
       <div>本月支出</div>
       <span class="expenses">￥{{ months("-") }}</span>
@@ -24,8 +24,11 @@
         </router-link>
       </div>
     </div>
-    <div>
+    <div v-if="recordList.length>0">
       <RecordListTags @update:value="edit" />
+    </div>
+    <div v-else >
+      <NoResult/>
     </div>
   </Layout>
 </template>
@@ -37,11 +40,12 @@ import { Component } from "vue-property-decorator";
 import dayjs from "dayjs";
 import clone from "@/lib/clone";
 import RecordListTags from "@/components/Details/RecordListTags.vue";
+import NoResult from "@/components/NoResult.vue";
 
 @Component({
-  components: { Tabs, RecordListTags },
+  components: { Tabs, RecordListTags ,NoResult},
 })
-export default class Statistics extends Vue {
+export default class Details extends Vue {
   get recordList() {
     return (this.$store.state as RootState).recordList;
   }
