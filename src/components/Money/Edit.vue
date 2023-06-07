@@ -1,6 +1,7 @@
 <template>
-  <Layout>
+  <Layout class-prefix="edit" :style="{ height: h + 'px' }">
     <Tabs :data-source="recordTypeList" :value.sync="type" />
+    <div class="editTag">
     <div class="detail">
       <span class="add">添加新的标签</span>
       <span><Icon name="add" @click="addTag(tags[0].type)" class="svg"/></span>
@@ -11,6 +12,7 @@
         ><span>{{ tag.value }} </span>
       </div>
       <span @click="deleteTag(tag)"><Icon name="remove" class="svg"/></span>
+    </div>
     </div>
   </Layout>
 </template>
@@ -27,6 +29,8 @@ import recordTypeList from "@/constants/recordTypeList";
 export default class Edit extends Vue {
   recordTypeList = recordTypeList;
   type = "-";
+  h = document.body.clientHeight;
+
   get tags() {
     if (this.type === "-") {
       return this.$store.state.tagList.filter(
@@ -61,7 +65,10 @@ export default class Edit extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+.editTag{
+  overflow: auto;
+}
 .detail {
   padding: 0 15px 0 10px;
   display: flex;
@@ -96,5 +103,9 @@ export default class Edit extends Vue {
     height: 18px;
   }
   }
+}
+::v-deep.layout-wrapper > .edit-content {
+  display: flex;
+  flex-direction: column;
 }
 </style>

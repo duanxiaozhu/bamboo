@@ -52,13 +52,6 @@ export default class Tags extends Vue {
   edit() {
     this.$router.push("/money/edit");
   }
-  create() {
-    const names = window.prompt("请输入标签名");
-    if (!names) {
-      return window.alert("标签不能为空");
-    }
-    this.$store.commit("createTag", names);
-  }
 }
 </script>
 
@@ -67,6 +60,7 @@ export default class Tags extends Vue {
   font-size: 12px;
   padding: 16px;
   flex-grow: 1;
+  overflow: auto;
   > .current {
     display: flex;
     flex-wrap: wrap;

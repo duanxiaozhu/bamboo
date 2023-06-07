@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <Layout class-prefix="statistics" :style="{ height: h + 'px' }">
     <Tabs
       class-prefix="type"
       :data-source="recordTypeList"
@@ -21,10 +21,10 @@
       <div class="average">平均值: ¥{{ average }}</div>
       <div id="figure"></div>
     </div>
+    <div class="caption">
+      <span>{{ typesName }}排行榜</span>
+    </div>
     <div class="ranking">
-      <div class="caption">
-        <span>{{typesName}}排行榜</span>
-      </div>
       <ul class="tag-list" v-if="targetRecords.length > 0">
         <li
           class="tag-item"
@@ -38,7 +38,7 @@
             <span>{{ item.tag.value }}</span>
             <span>{{ item.percentage }}%</span>
           </div>
-          <div>￥{{type}}{{ item.amount }}</div>
+          <div>￥{{ type }}{{ item.amount }}</div>
         </li>
       </ul>
       <div v-else>
@@ -74,9 +74,10 @@ export default class Statistics extends Vue {
   interval: "week" | "month" | "year" = "week";
   intervalList = intervalList;
   recordTypeList = recordTypeList;
+  h = document.body.clientHeight;
 
-  get typesName(){
-    return this.type==="-"?'支出':'收入'
+  get typesName() {
+    return this.type === "-" ? "支出" : "收入";
   }
   get targetRecords(): RecordList[] {
     const now = dayjs();
@@ -250,8 +251,8 @@ export default class Statistics extends Vue {
       grid: {
         top: "5%",
         bottom: "12%",
-        left:"2%",
-        right:"2%"
+        left: "2%",
+        right: "2%",
       },
       xAxis: {
         data: x,
@@ -285,7 +286,7 @@ export default class Statistics extends Vue {
         {
           type: "line",
           data: y,
-          symbolSize:10
+          symbolSize: 10,
         },
         {
           name: "平均线",
@@ -311,11 +312,12 @@ export default class Statistics extends Vue {
           },
         },
       ],
-      tooltip:{
-        show:true,triggerOn:'click',
-        formatter:'{c}',
-        position:'top'
-      }
+      tooltip: {
+        show: true,
+        triggerOn: "click",
+        formatter: "{c}",
+        position: "top",
+      },
     });
   }
   created() {
@@ -373,17 +375,17 @@ export default class Statistics extends Vue {
   }
 }
 
+.caption {
+  text-align: left;
+  font-size: 14px;
+  padding: 6px 16px;
+}
 .ranking {
-  >.caption {
-    text-align: left;
-    font-size: 14px;
-    padding: 6px 16px;
-  }
-
-  >.tag-list {
+  overflow: auto;
+  > .tag-list {
     padding: 6px 16px;
 
-    >.tag-item {
+    > .tag-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -391,11 +393,11 @@ export default class Statistics extends Vue {
       box-shadow: inset 0 -1px 1px -1px rgba(0, 0, 0, 0.1);
       font-size: 14px;
 
-      >.tag-info {
+      > .tag-info {
         display: flex;
         align-items: center;
 
-        >.icons {
+        > .icons {
           background: #f5f5f5;
           border-radius: 50%;
           width: 32px;
@@ -405,13 +407,13 @@ export default class Statistics extends Vue {
           align-items: center;
           margin-right: 8px;
 
-          >svg {
+          > svg {
             width: 24px;
             height: 24px;
           }
         }
 
-        >span {
+        > span {
           margin-right: 8px;
           line-height: 32px;
         }
@@ -423,30 +425,35 @@ export default class Statistics extends Vue {
   background: #e8e8e8;
   padding: 4px 16px 8px 16px;
 }
-::v-deep{ .tabs > .interval-tabs-item {
-  width: 33%;
-  height: 30px;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-  margin: 0;
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  &.selected {
-    background: #333;
-    color: #e8e8e8;
-    &::after {
-      display: none;
+::v-deep {
+  .tabs > .interval-tabs-item {
+    width: 33%;
+    height: 30px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    margin: 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    &.selected {
+      background: #333;
+      color: #e8e8e8;
+      &::after {
+        display: none;
+      }
     }
   }
+  .tabs > .interval-tabs-item:first-child {
+    border-radius: 4px 0 0 4px;
+    border: 1px solid black;
+  }
+  .tabs > .interval-tabs-item:last-child {
+    border-radius: 0 4px 4px 0;
+    border: 1px solid black;
+  }
 }
-.tabs > .interval-tabs-item:first-child {
-  border-radius: 4px 0 0 4px;
-  border: 1px solid black;
-}
-.tabs > .interval-tabs-item:last-child {
-  border-radius: 0 4px 4px 0;
-  border: 1px solid black;}
-
+::v-deep.layout-wrapper > .statistics-content {
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -24,4 +24,15 @@ export default {
 button,input{
   font: inherit;
 }
+.example {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.example::-webkit-scrollbar {
+  display: none;
+}
+body {
+  overflow-y: hidden; /* 隐藏垂直滚动条 */
+  overflow-x: hidden; /* 隐藏水平滚动条 */
+}
 </style>

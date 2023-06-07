@@ -1,5 +1,5 @@
 <template>
-  <Layout >
+  <Layout class-prefix="details" :style="{ height: h + 'px' }">
     <div class="title"><strong>账本明细</strong></div>
     <div class="parcel">
       <div>本月支出</div>
@@ -24,11 +24,11 @@
         </router-link>
       </div>
     </div>
-    <div v-if="recordList.length>0">
+    <div v-if="recordList.length > 0" class="recordListTags">
       <RecordListTags @update:value="edit" />
     </div>
-    <div v-else >
-      <NoResult/>
+    <div v-else>
+      <NoResult />
     </div>
   </Layout>
 </template>
@@ -43,9 +43,10 @@ import RecordListTags from "@/components/Details/RecordListTags.vue";
 import NoResult from "@/components/NoResult.vue";
 
 @Component({
-  components: { Tabs, RecordListTags ,NoResult},
+  components: { Tabs, RecordListTags, NoResult },
 })
 export default class Details extends Vue {
+  h = document.body.clientHeight;
   get recordList() {
     return (this.$store.state as RootState).recordList;
   }
@@ -73,13 +74,20 @@ export default class Details extends Vue {
     }
     this.$store.commit("createBudget", parseFloat(name));
   }
-  edit(id:string) {
+  edit(id: string) {
     this.$router.push(`/details/edit/${id}`);
   }
 }
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss">
+.recordListTags{
+  overflow: auto;
+}
+.details-content {
+  display: flex;
+  flex-direction: column;
+}
 .title {
   background: #e8e8e8;
   font-size: 18px;
