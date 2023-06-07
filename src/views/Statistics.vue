@@ -23,7 +23,7 @@
     </div>
     <div class="ranking">
       <div class="caption">
-        <span>支出排行榜</span>
+        <span>{{typesName}}排行榜</span>
       </div>
       <ul class="tag-list" v-if="targetRecords.length > 0">
         <li
@@ -38,7 +38,7 @@
             <span>{{ item.tag.value }}</span>
             <span>{{ item.percentage }}%</span>
           </div>
-          <div>￥{{ item.amount }}</div>
+          <div>￥{{type}}{{ item.amount }}</div>
         </li>
       </ul>
       <div v-else>
@@ -75,6 +75,9 @@ export default class Statistics extends Vue {
   intervalList = intervalList;
   recordTypeList = recordTypeList;
 
+  get typesName(){
+    return this.type==="-"?'支出':'收入'
+  }
   get targetRecords(): RecordList[] {
     const now = dayjs();
     return clone<RecordList[]>(this.$store.state.recordList)

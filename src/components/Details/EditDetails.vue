@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <Layout :style="{ height: h + 'px' }">
     <div class="navBar">
       <Icon name="left" class="leftIcon" @click.native="goBack" />
       <span><strong>编辑内容</strong></span>
@@ -44,6 +44,7 @@ import Button from "@/components/Button.vue";
 })
 export default class EditDetails extends Vue {
   currentRecord?: RecordList = undefined;
+  h = document.body.clientHeight;
 
   created() {
     const id = this.$route.params.id;
@@ -53,7 +54,7 @@ export default class EditDetails extends Vue {
     this.currentRecord = record;
   }
   updateAmount(value: string) {
-    if (parseFloat(value).toString()=== "NaN") {
+    if (parseFloat(value).toString() === "NaN") {
       this.$warning({
         centered: true,
         title: "金额不能为空",
@@ -66,12 +67,12 @@ export default class EditDetails extends Vue {
 
   revise() {
     const current = this.currentRecord as RecordList;
-      this.$store.commit("updateRecord", {
-        id: current.id,
-        amount: current.amount,
-        notes: current.notes,
-      });
-      this.$message.success({ content: "修改成功", duration: 1 });
+    this.$store.commit("updateRecord", {
+      id: current.id,
+      amount: current.amount,
+      notes: current.notes,
+    });
+    this.$message.success({ content: "修改成功", duration: 1 });
   }
   remove() {
     if (this.currentRecord) {

@@ -24,6 +24,3 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-if(document.documentElement.clientWidth>500){
-window.alert('使用手机效果更加')
-}

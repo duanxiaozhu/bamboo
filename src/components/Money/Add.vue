@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <Layout :style="{ height: h + 'px' }">
     <div class="navBar">
       <Icon name="left" class="leftIcon" @click.native="goBack" />
       <span>{{ moneyType }}新标签</span>
@@ -33,6 +33,8 @@ import IconsList from "@/components/Money/IconsList.vue";
 export default class Add extends Vue {
   icons = "dog";
   value = "";
+  h = document.body.clientHeight;
+
   get moneyType() {
     return this.$route.params.types === "expenditures" ? "支出" : "收入";
   }
@@ -92,7 +94,6 @@ export default class Add extends Vue {
     width: 28px;
     height: 28px;
   }
-
 }
 .form-wrapper {
   background: white;

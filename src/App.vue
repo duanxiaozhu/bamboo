@@ -19,7 +19,6 @@ export default {
   color: #333;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;font-size: 16px;
-  max-width: 500px;
   margin: 0 auto;
 }
 button,input{
