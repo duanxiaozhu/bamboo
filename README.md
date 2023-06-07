@@ -1,4 +1,4 @@
-# bamboo-1
+# bamboo
 
 ## Project setup
 ```
